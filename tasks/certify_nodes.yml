@@ -12,16 +12,16 @@
   shell: 'openssl genrsa -out {{ item }}-priv-key.pem 2048'
   args:
     chdir: "{{ ca_certs_dir }}"
-  with_inventory_hostnames: all:!localhost
+  with_inventory_hostnames: infra-instances:|localhost
 
 - name: "Create certificate request for Infra server || CA server"
   shell: 'openssl req -subj "/CN={{ item }}.{{ ca_domain }}" -new -key "{{ item }}"-priv-key.pem -out "{{ item }}".csr'
   args:
     chdir: "{{ ca_certs_dir }}"
-  with_inventory_hostnames: all:!localhost
+  with_inventory_hostnames: infra-instances:!localhost
 
 - name: "Generate the CA trusted certificate"
   shell: 'sudo openssl x509 -req -days 1825 -in "{{ item }}".csr -CA ca.pem -CAkey ca-priv-key.pem -CAcreateserial -out "{{ item }}"-cert.pem -extensions v3_req -extfile /usr/lib/ssl/openssl.cnf'
   args:
     chdir: "{{ ca_certs_dir }}"
-  with_inventory_hostnames: all:!localhost
+  with_inventory_hostnames: infra-instances:!localhost
