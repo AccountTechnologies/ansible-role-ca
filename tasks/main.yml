@@ -10,6 +10,17 @@
 
 - debug: var=ca_subject
 
+# See tasks/debug-inventory.yml
+
+- name: ensure infra-instances group exists
+  add_host:
+    name: '{{ item }}'
+    groups: infra-instances
+  with_items:
+  - "{{ groups['infra'] }}"
+  - "{{ groups['instances'] }}"
+  when: groups['infra-instances'] is not defined
+
 - include: ca-validations.yml
   when: (ca_force_create is undefined) and
         (inventory_hostname == hostvars[groups['infra-instances'][0]]['inventory_hostname'])
