@@ -3,7 +3,7 @@
 - include_vars: "{{ ansible_os_family }}.yml"
 
 
-- name: "set ca_subject var"
+- name: "Set ca_subject var"
   set_fact:
     ca_subject: '/CN={{ ca_commonname }}'
   when: ca_subject is not defined
@@ -12,7 +12,7 @@
 
 # See tasks/debug-inventory.yml
 
-- name: ensure infra-instances group exists
+- name: Ensure infra-instances group exists
   add_host:
     name: '{{ item }}'
     groups: infra-instances

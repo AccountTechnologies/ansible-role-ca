@@ -1,8 +1,8 @@
 ---
-- name: "ensure openssl is installed"
+- name: "Ensure openssl is installed"
   apt: name=openssl state=latest
 
-- name: "create configuration directory"
+- name: "Create configuration directory"
   file:
     path: "{{ item }}"
     state: directory

@@ -1,5 +1,5 @@
 ---
-- name: "generate CA private key"
+- name: "Generate CA private key"
   shell:
     "{{ item }}"
   args:
@@ -9,7 +9,7 @@
   when: _ca_key_exists is undefined or
         (ca_force_create is defined and ca_force_create|bool)
 
-- name: "greate root CA cert"
+- name: "Create root CA cert"
   shell:
     "{{ item }}"
   args:

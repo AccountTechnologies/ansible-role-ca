@@ -1,6 +1,6 @@
 ---
 
-- name: "Ensures {{ ca_default_ssl_certs_dir }} and {{ ca_defult_ssl_key_dir }} dirs exist"
+- name: "Ensure {{ ca_default_ssl_certs_dir }} and {{ ca_defult_ssl_key_dir }} dirs exist"
   file:
     path: "{{ item }}"
     state: directory
@@ -24,21 +24,22 @@
 
 # Root CA key/cert
 
-- name: "copy {{ ca_key }} to {{ ca_default_ssl_key_dir }}"
+- name: "Copy {{ ca_key }} to {{ ca_default_ssl_key_dir }}"
   copy:
     src: "{{ ca_distribution_certs_dir }}/{{ item }}"
     dest: "{{ ca_default_ssl_key_dir }}/{{ item }}"
   with_items:
   - "{{ ca_key }}"
 
-- name: "copy {{ ca_cert }} to {{ ca_default_ssl_certs_dir }}"
+- name: "Copy {{ ca_cert }} to {{ ca_default_ssl_certs_dir }}"
   copy:
     src: "{{ ca_distribution_certs_dir }}/{{ item }}"
     dest: "{{ ca_default_ssl_certs_dir }}/{{ item }}"
   with_items:
   - "{{ ca_cert }}"
 
-- shell: "ls -lR {{ item }}"
+- name: Get file metadata
+  shell: "ls -lR {{ item }}"
   with_items:
   - "{{ ca_default_ssl_key_dir }}/{{ inventory_hostname }}-priv-key.pem"
   - "{{ ca_default_ssl_certs_dir }}/{{ inventory_hostname }}-cert.pem"

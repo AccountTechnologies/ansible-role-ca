@@ -1,6 +1,6 @@
 ---
 
-- name: "make sure the {{ ca_certs_dir }} is present"
+- name: "Make sure the {{ ca_certs_dir }} is present"
   file:
     state: directory
     path: "{{ ca_certs_dir }}"
@@ -8,13 +8,13 @@
     group: root
     mode: 0755
 
-- name: "Generate Certs for Infra server || CA server"
+- name: "Generate certs for infra server || CA server"
   shell: 'openssl genrsa -out {{ item }}-priv-key.pem 2048'
   args:
     chdir: "{{ ca_certs_dir }}"
-  with_inventory_hostnames: infra-instances:|localhost
+  with_inventory_hostnames: infra-instances:!localhost
 
-- name: "Create certificate request for Infra server || CA server"
+- name: "Create certificate request for infra server || CA server"
   shell: 'openssl req -subj "/CN={{ item }}.{{ ca_domain }}" -new -key "{{ item }}"-priv-key.pem -out "{{ item }}".csr'
   args:
     chdir: "{{ ca_certs_dir }}"
