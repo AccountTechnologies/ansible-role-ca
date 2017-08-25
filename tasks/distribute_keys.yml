@@ -13,11 +13,14 @@
   - "{{ ca_default_ssl_key_dir }}"
 
 - name: "Distribute inventory_hostname-priv-key.pem to inventory_hostname"
-  copy: src="{{ ca_distribution_certs_dir }}/{{ inventory_hostname }}-priv-key.pem" dest="{{ ca_default_ssl_key_dir }}/{{ inventory_hostname }}-priv-key.pem"
+  copy:
+    src: "{{ ca_distribution_certs_dir }}/{{ inventory_hostname }}-priv-key.pem"
+    dest: "{{ ca_default_ssl_key_dir }}/{{ inventory_hostname }}-priv-key.pem"
 
 - name: "Distribute inventory_hostname-cert.pem to inventory_hostname"
-  copy: src="{{ ca_distribution_certs_dir }}/{{ inventory_hostname }}-cert.pem" dest="{{ ca_default_ssl_certs_dir }}/{{ inventory_hostname }}-cert.pem"
-
+  copy:
+    src: "{{ ca_distribution_certs_dir }}/{{ inventory_hostname }}-cert.pem"
+    dest: "{{ ca_default_ssl_certs_dir }}/{{ inventory_hostname }}-cert.pem"
 
 # Root CA key/cert
 
