@@ -3,9 +3,9 @@
 #
 # ca_force_create & ca_force_certify_nodes are designed to prevent overiding of existing certificates !
 
-#ca_force_create:
+ca_force_create: false
 ca_force_certify_nodes: false
-# see "{{ ansible_os_family }}.yml"
+# see "{{ ansible_os_family }}.yml" for pki_cert_dir definition
 ca_default_ssl_certs_dir: "{{ pki_cert_dir | d('/etc/ssl/certs') }}"
 ca_default_ssl_key_dir: "{{ pki_key_dir | d('/etc/ssl/private') }}"
 
@@ -15,7 +15,7 @@ ca_cert_expiration_panic_threshold: 604800 # 1 week
 # where to generate the certs
 ca_certs_dir: /usr/share/ca-certs
 
-# where to copy the produces files to
+# where to copy the produced files
 ca_distribution_certs_dir: "{{ playbook_dir }}/../keys_n_certs"
 
 ca_rootca_password: Chang3m3

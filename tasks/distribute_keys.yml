@@ -43,9 +43,9 @@
   - "{{ ca_default_ssl_key_dir }}/{{ inventory_hostname }}-priv-key.pem"
   - "{{ ca_default_ssl_certs_dir }}/{{ inventory_hostname }}-cert.pem"
   register: ls
-  when: debug is defined
+  when: debug is defined and debug|bool
 
 - debug: var=item.stdout_lines
   with_items:
   - "{{ ls.results }}"
-  when: debug is defined
+  when: debug is defined and debug|bool
