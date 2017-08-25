@@ -11,23 +11,27 @@
 - debug: var=ca_subject
 
 - include: ca-validations.yml
-  when: (ca_force_create is undefined) and (inventory_hostsname == hostvars[groups['infra-instances'][0]]['inventory_hostname'])
+  when: (ca_force_create is undefined) and
+        (inventory_hostname == hostvars[groups['infra-instances'][0]]['inventory_hostname'])
 
 - include: ca-conf.yml
-  when: ca_init is defined and ca_force_create == true # defaults to false ...
+  when: (ca_init is defined and ca_init|bool) and
+        (ca_force_create is defined and ca_force_create|bool)
 
 - include: ca-key_n_cert.yml
-  when: ca_init is defined and ca_force_create == true # defaults to false ...
+  when: (ca_init is defined and ca_init|bool) and
+        (ca_force_create is defined and ca_force_create|bool)
 
 - include: certify_nodes.yml
-  when: ca_certify_nodes is defined and ca_force_certify_nodes # defaults to false ...
+  when: (ca_certify_nodes is defined and ca_certify_nodes|bool) and
+        (ca_force_certify_nodes is defined and ca_force_certify_nodes|bool)
 
 - include: wildcard_cert.yml
-  when: ca_wildcard is defined
+  when: ca_wildcard is defined and ca_wildcard|bool
 
 - include: fetch_keys.yml
-  when: ca_fetch_keys is defined
+  when: ca_fetch_keys is defined and ca_wildcard|bool
 
 - include: distribute_keys.yml
-  when: ca_distribute_keys is defined
+  when: ca_distribute_keys is defined and ca_distribute_keys|bool
 
