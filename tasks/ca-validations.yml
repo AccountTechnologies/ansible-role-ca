@@ -1,61 +1,59 @@
 ---
 
-# Check for CA key existence (so we don't getnerate a new onw on every run)
 - block:
-
-    - name: "Check if ca.key certificate exsists"
-      stat: path="{{ ca_default_ssl_key_dir }}/{{ ca_key }}"
-      register: __key_file
+    - name: "Check if ca.key certificate exists"
+      stat:
+        path: "{{ ca_default_ssl_key_dir }}/{{ ca_key }}"
+      register: _key_file
+      become: yes
 
     - name: "Verify {{ ca_default_ssl_key_dir }}/{{ ca_key }} status"
-      debug: msg="{{ ca_default_ssl_key_dir }}/{{ ca_key }} is present
-                  - setting fact _ca_key_exists [ internal fact with _ prefix ] to true - this role will not generate a new one"
-      when: __key_file.stat.exists
+      debug: msg="{{ ca_default_ssl_key_dir }}/{{ ca_key }} is present"
+      when: _key_file.stat.exists
 
-    - name: "Set _ca_key_exists var to true"
+    - name: "Set _ca_needs_key var to {{ not _key_file.stat.exists }}"
       set_fact:
-        _ca_key_exists: true
+        _ca_needs_key: "{{ not _key_file.stat.exists }}"
 
   rescue:
-    - name: "Rescue block - Key exists ..."
-      debug: msg="{{ ca_default_ssl_key_dir }}/{{ ca_key }} is present
-                  (if you want a new one remove the exsiting one and rerun this role)
-                  - setting fact ca_key_exists to false"
+    - name: "Rescue block - Key does not exist ..."
+      debug: msg="{{ ca_default_ssl_key_dir }}/{{ ca_key }} is not present"
 
-    - name: "Set _ca_key_exists var to false"
+    - name: "Set _ca_needs_key var to true"
       set_fact:
-        _ca_key_exists: false
+        _ca_needs_key: true
 
   always:
-    - name: "Show _ca_key_exists value"
-      debug: msg="variable _ca_key_exists is set to {{ _ca_key_exists }}"
+    - name: "Show _ca_needs_key value"
+      debug: msg="Variable _ca_needs_key is set to {{ _ca_needs_key }}"
 
-# Check for CA cert existence (so we don't getnerate a new onw on every run)
 - block:
-
     - name: "Check if ca.pem certificate exsists"
-      stat: path="{{ ca_certs_dir }}/{{ ca_cert }}"
-      register: cert_file
+      stat:
+        path: "{{ ca_certs_dir }}/{{ ca_cert }}"
+      register: _cert_file
+      become: yes
 
-    - name: "Check certificate expiration date [ Expecting more than a week before setting regeneration var ... ]"
-      shell: "openssl x509 -checkend {{ ca_cert_expiration_panic_threshold }} -noout -in {{ ca_certs_dir }}/{{ ca_cert }}"
-      when: cert_file and cert_file.stat.exists
-      register: cert_validity
+    - name: "Check certificate expiration date"
+      shell: >
+        openssl x509 -checkend {{ ca_cert_expiration_panic_threshold }}
+        -noout -in {{ ca_certs_dir }}/{{ ca_cert }}
+      when: _cert_file.stat.exists
+      register: _cert_validity
 
-    - debug: msg="{{ ca_certs_dir }}/{{ ca_cert }} is still valid no need to generate"
-      when: cert_validity and cert_validity.rc == 0
+    - debug: msg="{{ ca_certs_dir }}/{{ ca_cert }} is still valid"
+      when: _cert_validity.rc|int == 0
 
     - set_fact:
-        ca_force_create: false
-        _ca_missing_cert: false
+        _ca_needs_cert: false
 
   rescue:
-    - debug: msg="{{ ca_certs_dir }}/{{ ca_cert }} is not valid - ca_force_create will be set"
+    - debug: msg="{{ ca_certs_dir }}/{{ ca_cert }} does not exist or is not valid"
     - set_fact:
-        ca_force_create: true
-        _ca_missing_cert: true
+        _ca_needs_cert: true
 
   always:
-    - debug: var=_ca_key_exists
-    - debug: var=_ca_missing_cert
-    - debug: var=ca_force_create
+    - debug: var=_ca_needs_key
+    - debug: var=_ca_needs_cert
+
+# vim: ft=ansible :

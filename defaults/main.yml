@@ -1,10 +1,21 @@
 ---
-# defaults file for ansible-role-ca
+
+# Defaults file for ansible-role-ca
 #
-# ca_force_create & ca_force_certify_nodes are designed to prevent overiding of existing certificates !
+# ca_force_create & ca_force_certify_nodes are designed to prevent
+# over-writing existing certificates!
 
 ca_force_create: false
 ca_force_certify_nodes: false
+
+# The following variables control which sub-tasks are performed.
+# Set to true to enable them
+ca_init: false
+ca_certify_nodes: false
+ca_wildcard: false
+ca_fetch_keys: false
+ca_distribute_keys: false
+
 # see "{{ ansible_os_family }}.yml" for pki_cert_dir definition
 ca_default_ssl_certs_dir: "{{ pki_cert_dir | d('/etc/ssl/certs') }}"
 ca_default_ssl_key_dir: "{{ pki_key_dir | d('/etc/ssl/private') }}"

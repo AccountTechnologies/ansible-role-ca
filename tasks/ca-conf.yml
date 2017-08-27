@@ -1,6 +1,4 @@
 ---
-- name: "Ensure openssl is installed"
-  apt: name=openssl state=latest
 
 - name: "Create configuration directory"
   file:
@@ -9,16 +7,19 @@
     owner: root
     group: root
   with_items:
-  - "{{ ca_certs_dir }}"
+    - "{{ ca_certs_dir }}"
+  become: yes
 
 - name: "Deploy configuration items"
   template:
     src: "{{ item }}.j2"
     dest: "{{ ca_certs_dir }}/{{ item }}"
     owner: root
-    group: root
+    group: ssl-cert
+    mode: 0750
   with_items:
     - serial
     - ca.conf
+  become: yes
 
-
+# vim: ft=ansible :

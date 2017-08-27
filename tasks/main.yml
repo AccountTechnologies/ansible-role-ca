@@ -1,48 +1,68 @@
 ---
-# tasks file for ansible-role-ca
-- include_vars: "{{ ansible_os_family }}.yml"
 
+# tasks file for ansible-role-ca
+
+- include_vars: "{{ ansible_os_family }}.yml"
+  tags: [ ca-certs ]
 
 - name: "Set ca_subject var"
   set_fact:
     ca_subject: '/CN={{ ca_commonname }}'
   when: ca_subject is not defined
+  tags: [ ca-certs ]
 
 - debug: var=ca_subject
+  tags: [ ca-certs ]
+
+- include: packages.yml
+  tags: [ ca-certs ]
 
 # See tasks/debug-inventory.yml
 
-- name: Ensure infra-instances group exists
+- name: Ensure ssl-cert group is present for access
+  group:
+    name: ssl-cert
+    state: present
+  tags: [ ca-certs ]
+
+- name: Ensure infra-instances Ansible group exists
   add_host:
     name: '{{ item }}'
     groups: infra-instances
   with_items:
-  - "{{ groups['infra'] }}"
-  - "{{ groups['instances'] }}"
+    - "{{ groups['infra'] }}"
+    - "{{ groups['instances'] }}"
   when: groups['infra-instances'] is not defined
+  tags: [ ca-certs ]
 
 - include: ca-validations.yml
-  when: (ca_force_create is undefined) and
-        (inventory_hostname == hostvars[groups['infra-instances'][0]]['inventory_hostname'])
+  when: (inventory_hostname == hostvars[groups['infra-instances'][0]]['inventory_hostname'])
+  tags: [ ca-certs ]
 
 - include: ca-conf.yml
-  when: (ca_init is defined and ca_init|bool) and
-        (ca_force_create is defined and ca_force_create|bool)
+  when: ca_init is defined and ca_init|bool
+  tags: [ ca-certs ]
 
 - include: ca-key_n_cert.yml
-  when: (ca_init is defined and ca_init|bool) and
-        (ca_force_create is defined and ca_force_create|bool)
+  when: ca_init is defined and ca_init|bool
+  tags: [ ca-certs ]
 
 - include: certify_nodes.yml
-  when: (ca_certify_nodes is defined and ca_certify_nodes|bool) and
-        (ca_force_certify_nodes is defined and ca_force_certify_nodes|bool)
+  when: (ca_certify_nodes is defined and ca_certify_nodes|bool) or
+        (ca_force_certify_nodes is defined and ca_force_certify_nodes|bool) and
+        (inventory_hostname == hostvars[groups['infra-instances'][0]]['inventory_hostname'])
+  tags: [ ca-certs ]
 
 - include: wildcard_cert.yml
   when: ca_wildcard is defined and ca_wildcard|bool
+  tags: [ ca-certs ]
 
 - include: fetch_keys.yml
-  when: ca_fetch_keys is defined and ca_wildcard|bool
+  when: (ca_fetch_keys is defined and ca_fetch_keys|bool)
+  tags: [ ca-certs ]
 
 - include: distribute_keys.yml
   when: ca_distribute_keys is defined and ca_distribute_keys|bool
+  tags: [ ca-certs ]
 
+# vim: ft=ansible :

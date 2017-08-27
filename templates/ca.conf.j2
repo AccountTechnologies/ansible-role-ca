@@ -1,7 +1,7 @@
 [ ca ]
-default_ca = {{ ca_organization }}_ca
+default_ca = {{ ca_organization|regex_replace("[^a-zA-Z_]","_") }}_ca
 
-[ {{ ca_organization }}_ca ]
+[ {{ ca_organization|regex_replace("[^a-zA-Z_]","_") }}_ca ]
 unique_subject = no
 new_certs_dir = .
 certificate = {{ ca_cert }}

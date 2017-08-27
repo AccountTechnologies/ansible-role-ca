@@ -1,52 +1,70 @@
 ---
 
-- name: "Ensure {{ ca_default_ssl_certs_dir }} and {{ ca_defult_ssl_key_dir }} dirs exist"
+- name: "Ensure {{ ca_default_ssl_certs_dir }} and {{ ca_default_ssl_key_dir }} dirs exist"
   file:
     path: "{{ item }}"
     state: directory
     owner: root
-    group: root
-    mode: 0750
-    recurse: yes
+    group: ssl-cert
+    mode: 0755
   with_items:
-  - "{{ ca_default_ssl_certs_dir }}"
-  - "{{ ca_default_ssl_key_dir }}"
+    - "{{ ca_default_ssl_certs_dir }}"
+    - "{{ ca_default_ssl_key_dir }}"
+  become: yes
+
+- name: Ensure certificate trust store is open (RedHat)
+  shell: "update-ca-trust force-enable"
+  when: ansible_os_family == "RedHat"
+  become: yes
 
 - name: "Distribute inventory_hostname-priv-key.pem to inventory_hostname"
   copy:
     src: "{{ ca_distribution_certs_dir }}/{{ inventory_hostname }}-priv-key.pem"
     dest: "{{ ca_default_ssl_key_dir }}/{{ inventory_hostname }}-priv-key.pem"
+    owner: root
+    group: ssl-cert
+    mode: 0750
+  become: yes
 
 - name: "Distribute inventory_hostname-cert.pem to inventory_hostname"
   copy:
     src: "{{ ca_distribution_certs_dir }}/{{ inventory_hostname }}-cert.pem"
     dest: "{{ ca_default_ssl_certs_dir }}/{{ inventory_hostname }}-cert.pem"
-
-# Root CA key/cert
-
-- name: "Copy {{ ca_key }} to {{ ca_default_ssl_key_dir }}"
-  copy:
-    src: "{{ ca_distribution_certs_dir }}/{{ item }}"
-    dest: "{{ ca_default_ssl_key_dir }}/{{ item }}"
-  with_items:
-  - "{{ ca_key }}"
+    owner: root
+    group: ssl-cert
+    mode: 0755
+  become: yes
 
 - name: "Copy {{ ca_cert }} to {{ ca_default_ssl_certs_dir }}"
   copy:
-    src: "{{ ca_distribution_certs_dir }}/{{ item }}"
-    dest: "{{ ca_default_ssl_certs_dir }}/{{ item }}"
-  with_items:
-  - "{{ ca_cert }}"
+    src: "{{ ca_distribution_certs_dir }}/{{ ca_cert }}"
+    dest: "{{ ca_default_ssl_certs_dir }}/{{ ca_cert }}"
+    owner: root
+    group: ssl-cert
+    mode: 0755
+  become: yes
+
+- name: Ensure certificate trust store is updated (Debian)
+  shell: "update-ca-certificates"
+  when: ansible_os_family == "Debian"
+  become: yes
+
+- name: Ensure certificate trust store is open (RedHat)
+  shell: "update-ca-trust extract"
+  when: ansible_os_family == "RedHat"
+  become: yes
 
 - name: Get file metadata
   shell: "ls -lR {{ item }}"
   with_items:
-  - "{{ ca_default_ssl_key_dir }}/{{ inventory_hostname }}-priv-key.pem"
-  - "{{ ca_default_ssl_certs_dir }}/{{ inventory_hostname }}-cert.pem"
+    - "{{ ca_default_ssl_key_dir }}/{{ inventory_hostname }}-priv-key.pem"
+    - "{{ ca_default_ssl_certs_dir }}/{{ inventory_hostname }}-cert.pem"
   register: ls
   when: debug is defined and debug|bool
 
 - debug: var=item.stdout_lines
   with_items:
-  - "{{ ls.results }}"
+    - "{{ ls.results }}"
   when: debug is defined and debug|bool
+
+# vim: ft=ansible :
