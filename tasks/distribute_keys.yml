@@ -44,6 +44,11 @@
     mode: 0755
   become: yes
 
+# https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-14-04
+- name: Generate strong Diffie-Hellman group
+  shell: "openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048"
+  become: yes
+
 - name: Ensure certificate trust store is updated (Debian)
   shell: "update-ca-certificates"
   when: ansible_os_family == "Debian"
