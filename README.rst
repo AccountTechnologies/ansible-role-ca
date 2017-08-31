@@ -5,7 +5,7 @@
 * License: Apache 2.0
 
 The repository contains a substantially modified version of the
-`Anasible CA role`_ originally written by
+`Ansible CA role`_ originally written by
 `Haggai Phillip Zagury`_. The modifications fix a number of bugs,
 add support for tags, and integrate the functionality of this
 role in the model used by the `uw-dims/ansible-dims-playbooks`_
@@ -25,5 +25,5 @@ Dave Dittrich dittrich@u.washington.edu
 
 Copyright |copy| 2017 University of Washington. All rights reserved.
 
-.. include:: LICENSE.txt
+.. include:: LICENSE
    :literal:
