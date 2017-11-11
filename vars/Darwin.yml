@@ -1,0 +1,4 @@
+---
+
+pki_cert_dir: /usr/local/etc/openssl/certs
+pki_key_dir: /usr/local/etc/openssl/private
