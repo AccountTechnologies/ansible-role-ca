@@ -14,7 +14,7 @@
   args:
     chdir: '{{ ca_certs_dir }}'
   become: yes
-  with_inventory_hostnames: infra-instances:!localhost
+  with_inventory_hostnames: infra_instances:!localhost
 
 - name: 'Create certificate request for infra server || CA server'
   shell: >
@@ -23,7 +23,7 @@
   args:
     chdir: '{{ ca_certs_dir }}'
   become: yes
-  with_inventory_hostnames: infra-instances:!localhost
+  with_inventory_hostnames: infra_instances:!localhost
 
 - name: 'Generate the CA trusted certificate'
   shell: >
@@ -35,6 +35,6 @@
   args:
     chdir: '{{ ca_certs_dir }}'
   become: yes
-  with_inventory_hostnames: infra-instances:!localhost
+  with_inventory_hostnames: infra_instances:!localhost
 
 # vim: ft=ansible :
