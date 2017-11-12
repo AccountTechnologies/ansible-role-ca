@@ -2,10 +2,10 @@
 
 # tasks file for ansible-role-ca
 
-- include_vars: "{{ ansible_os_family }}.yml"
+- include_vars: '{{ ansible_os_family }}.yml'
   tags: [ ca-certs ]
 
-- name: "Set ca_subject var"
+- name: 'Set ca_subject var'
   set_fact:
     ca_subject: '/CN={{ ca_commonname }}'
   when: ca_subject is not defined

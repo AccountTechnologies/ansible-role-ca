@@ -1,54 +1,54 @@
 ---
 
 - block:
-    - name: "Check if ca.key certificate exists"
+    - name: 'Check if ca.key certificate exists'
       stat:
-        path: "{{ ca_default_ssl_key_dir }}/{{ ca_key }}"
+        path: '{{ ca_default_ssl_key_dir }}/{{ ca_key }}'
       register: _key_file
       become: yes
 
-    - name: "Verify {{ ca_default_ssl_key_dir }}/{{ ca_key }} status"
-      debug: msg="{{ ca_default_ssl_key_dir }}/{{ ca_key }} is present"
+    - name: 'Verify {{ ca_default_ssl_key_dir }}/{{ ca_key }} status'
+      debug: msg='{{ ca_default_ssl_key_dir }}/{{ ca_key }} is present'
       when: _key_file.stat.exists
 
-    - name: "Set _ca_needs_key var to {{ not _key_file.stat.exists }}"
+    - name: 'Set _ca_needs_key var to {{ not _key_file.stat.exists }}'
       set_fact:
-        _ca_needs_key: "{{ not _key_file.stat.exists }}"
+        _ca_needs_key: '{{ not _key_file.stat.exists }}'
 
   rescue:
-    - name: "Rescue block - Key does not exist ..."
-      debug: msg="{{ ca_default_ssl_key_dir }}/{{ ca_key }} is not present"
+    - name: 'Rescue block - Key does not exist ...'
+      debug: msg='{{ ca_default_ssl_key_dir }}/{{ ca_key }} is not present'
 
-    - name: "Set _ca_needs_key var to true"
+    - name: 'Set _ca_needs_key var to true'
       set_fact:
         _ca_needs_key: true
 
   always:
-    - name: "Show _ca_needs_key value"
-      debug: msg="Variable _ca_needs_key is set to {{ _ca_needs_key }}"
+    - name: 'Show _ca_needs_key value'
+      debug: msg='Variable _ca_needs_key is set to {{ _ca_needs_key }}'
 
 - block:
-    - name: "Check if ca.pem certificate exsists"
+    - name: 'Check if ca.pem certificate exsists'
       stat:
-        path: "{{ ca_certs_dir }}/{{ ca_cert }}"
+        path: '{{ ca_certs_dir }}/{{ ca_cert }}'
       register: _cert_file
       become: yes
 
-    - name: "Check certificate expiration date"
+    - name: 'Check certificate expiration date'
       shell: >
         openssl x509 -checkend {{ ca_cert_expiration_panic_threshold }}
         -noout -in {{ ca_certs_dir }}/{{ ca_cert }}
       when: _cert_file.stat.exists
       register: _cert_validity
 
-    - debug: msg="{{ ca_certs_dir }}/{{ ca_cert }} is still valid"
+    - debug: msg='{{ ca_certs_dir }}/{{ ca_cert }} is still valid'
       when: _cert_validity.rc|int == 0
 
     - set_fact:
         _ca_needs_cert: false
 
   rescue:
-    - debug: msg="{{ ca_certs_dir }}/{{ ca_cert }} does not exist or is not valid"
+    - debug: msg='{{ ca_certs_dir }}/{{ ca_cert }} does not exist or is not valid'
     - set_fact:
         _ca_needs_cert: true
 

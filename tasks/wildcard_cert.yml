@@ -1,28 +1,28 @@
 ---
 
-- name: "Generate wildcard cert infra server || CA server"
+- name: 'Generate wildcard cert infra server || CA server'
   shell: 'openssl genrsa -out {{ ca_domain }}-wildcard-priv-key.pem 2048'
   args:
-    chdir: "{{ ca_certs_dir }}"
+    chdir: '{{ ca_certs_dir }}'
   become: yes
 
-- name: "Create wildcard certificate request for *.{{ ca_domain }}"
+- name: 'Create wildcard certificate request for *.{{ ca_domain }}'
   shell: >
-    openssl req -subj "/CN=\*.{{ ca_domain }}" -new
+    openssl req -subj '/CN=\*.{{ ca_domain }}' -new
     -key {{ ca_domain }}-wildcard-priv-key.pem -out {{ ca_domain}}-wildcard.csr
   args:
-    chdir: "{{ ca_certs_dir }}"
+    chdir: '{{ ca_certs_dir }}'
   become: yes
 
 
-- name: "Generate the CA trusted certificate"
+- name: 'Generate the CA trusted certificate'
   shell: >
     openssl x509 -req -days 1825 -in {{ ca_domain }}-wildcard.csr
     -CA ca.pem -CAkey ca-priv-key.pem -CAcreateserial
     -out {{ ca_domain }}-wildcard-cert.pem -extensions v3_req
     -extfile /usr/lib/ssl/openssl.cnf
   args:
-    chdir: "{{ ca_certs_dir }}"
+    chdir: '{{ ca_certs_dir }}'
   become: yes
 
 # vim: ft=ansible :

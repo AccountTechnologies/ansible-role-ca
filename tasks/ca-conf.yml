@@ -1,19 +1,19 @@
 ---
 
-- name: "Create configuration directory"
+- name: 'Create configuration directory'
   file:
-    path: "{{ item }}"
+    path: '{{ item }}'
     state: directory
     owner: root
     group: root
   with_items:
-    - "{{ ca_certs_dir }}"
+    - '{{ ca_certs_dir }}'
   become: yes
 
-- name: "Deploy configuration items"
+- name: 'Deploy configuration items'
   template:
-    src: "{{ item }}.j2"
-    dest: "{{ ca_certs_dir }}/{{ item }}"
+    src: '{{ item }}.j2'
+    dest: '{{ ca_certs_dir }}/{{ item }}'
     owner: root
     group: ssl-cert
     mode: 0750

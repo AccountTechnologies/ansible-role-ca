@@ -1,26 +1,26 @@
 ---
 
-- name: Only "update_cache=yes" if >3600s since last update (Debian)
+- name: Only 'update_cache=yes' if >3600s since last update (Debian)
   apt: update_cache=yes cache_valid_time=3600
-  when: ansible_os_family == "Debian"
+  when: ansible_os_family == 'Debian'
   become: yes
 
-- name: "Ensure required packages are installed (Debian)"
+- name: 'Ensure required packages are installed (Debian)'
   apt:
     name: '{{ item }}'
     state: latest
   with_items:
     - openssl
     - ca-certificates
-  when: ansible_os_family == "Debian"
+  when: ansible_os_family == 'Debian'
 
-- name: "Ensure required packages are installed (RedHat)"
+- name: 'Ensure required packages are installed (RedHat)'
   yum:
     name: '{{ item }}'
     state: latest
   with_items:
     - openssl
     - ca-certificates
-  when: ansible_os_family == "RedHat"
+  when: ansible_os_family == 'RedHat'
 
 # vim: ft=ansible :

@@ -1,20 +1,20 @@
 ---
 
-- name: "Generate CA private key"
-  shell: "openssl genrsa -out {{ ca_key }} 2048"
+- name: 'Generate CA private key'
+  shell: 'openssl genrsa -out {{ ca_key }} 2048'
   args:
-    chdir: "{{ ca_certs_dir }}"
+    chdir: '{{ ca_certs_dir }}'
   when: _ca_needs_key or ca_force_create|bool
   become: yes
 
-- name: "Create root CA cert"
+- name: 'Create root CA cert'
   shell: >
     openssl req -config {{ ca_certs_dir }}/ca.conf
     -new -key {{ ca_key }} -x509 -days 1825
     -out {{ ca_cert }} -passin pass:{{ ca_rootca_password }}
     -subj '{{ ca_subject }}'
   args:
-    chdir: "{{ ca_certs_dir }}"
+    chdir: '{{ ca_certs_dir }}'
   when: _ca_needs_cert or ca_force_create|bool
   become: yes
 
