@@ -17,7 +17,8 @@
 
   rescue:
     - name: "Rescue block - Key does not exist ..."
-      debug: msg="{{ ca_default_ssl_key_dir }}/{{ ca_key }} is not present"
+      debug: 
+        msg: "{{ ca_default_ssl_key_dir }}/{{ ca_key }} is not present"
 
     - name: "Set _ca_needs_key var to true"
       set_fact:
@@ -25,7 +26,8 @@
 
   always:
     - name: "Show _ca_needs_key value"
-      debug: msg="Variable _ca_needs_key is set to {{ _ca_needs_key }}"
+      debug: 
+        msg: "Variable _ca_needs_key is set to {{ _ca_needs_key }}"
 
 - block:
     - name: "Check if ca.pem certificate exsists"
@@ -41,19 +43,26 @@
       when: _cert_file.stat.exists
       register: _cert_validity
 
-    - debug: msg="{{ ca_certs_dir }}/{{ ca_cert }} is still valid"
-      when: _cert_validity.rc|int == 0
+    - debug: 
+        msg: "{{ ca_certs_dir }}/{{ ca_cert }} is still valid"
+      when: (_cert_file.stat.exists) and (_cert_validity.rc|int == 0)
 
     - set_fact:
         _ca_needs_cert: false
 
   rescue:
-    - debug: msg="{{ ca_certs_dir }}/{{ ca_cert }} does not exist or is not valid"
+    - debug: 
+        msg: "{{ ca_certs_dir }}/{{ ca_cert }} does not exist or is not valid"
     - set_fact:
         _ca_needs_cert: true
 
   always:
-    - debug: var=_ca_needs_key
-    - debug: var=_ca_needs_cert
+    - name:  ca needs key
+      debug: 
+        var: _ca_needs_key
+
+    - name:  ca needs cert
+      debug: 
+        var: _ca_needs_cert
 
 # vim: ft=ansible :

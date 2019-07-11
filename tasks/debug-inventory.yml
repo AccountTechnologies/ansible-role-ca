@@ -2,17 +2,17 @@
 
 # Dave Dittrich <dittrich@u.washington.edu>
 #
-# The ansible-role-ca role assumes that a group named 'infra-instances'
+# The ansible-role-ca role assumes that a group named 'ca-all'
 # exists in a pre-defined order (i.e., the 0th element is the CA
 # host, and all other hosts are infrastructure needing self-signed
 # certs). That might work using a INI style inventory, and certainly
 # works with a custom dynamic inventory script that forces the order
-# when creating the 'infra-instances' group (which is a list), but
+# when creating the 'ca-all' group (which is a list), but
 # it does not work as the role expects when using a YAML style
 # inventory (which is a dictionary).
 #
 # To get around this, a task in tasks/main.yml will create the
-# group "infra-instances" manually from two children dictionaries
+# group "ca-all" manually from two children dictionaries
 # in a YAML style inventory named "infra" (holding the CA host)
 # and "instances" (holding the nodes that need self-signed certs).
 # The inventory file would look something like this:
@@ -45,9 +45,9 @@
 #
 # $ ansible-playbook -i $PBR/inventory tasks/debug-inventory.yml
 #
-# PLAY [Debug infra-instances group creating] ***********************************
+# PLAY [Debug ca-all group creating] ***********************************
 #
-# TASK [ensure infra-instances group exists] ************************************
+# TASK [ensure ca-all group exists] ************************************
 # Friday 25 August 2017  15:16:19 -0700 (0:00:00.032)       0:00:00.032 *********
 # changed: [localhost] => (item=vmhost.devops.local)
 # changed: [localhost] => (item=purple.devops.local)
@@ -59,7 +59,7 @@
 # TASK [debug] ******************************************************************
 # Friday 25 August 2017  15:16:25 -0700 (0:00:06.165)       0:00:06.198 *********
 # ok: [localhost] => {
-#     "groups['infra-instances']": [
+#     "groups['ca-all']": [
 #         "vmhost.devops.local",
 #         "purple.devops.local",
 #         "gray.devops.local",
@@ -72,7 +72,7 @@
 # TASK [debug] ******************************************************************
 # Friday 25 August 2017  15:16:26 -0700 (0:00:01.040)       0:00:07.238 *********
 # ok: [localhost] => {
-#     "hostvars[groups['infra-instances'][0]]['inventory_hostname']": "vmhost.devops.local"
+#     "hostvars[groups['ca-all'][0]]['inventory_hostname']": "vmhost.devops.local"
 # }
 #
 # PLAY RECAP ********************************************************************
@@ -80,25 +80,25 @@
 #
 # Friday 25 August 2017  15:16:28 -0700 (0:00:02.086)       0:00:09.324 *********
 # ===============================================================================
-# ensure infra-instances group exists ------------------------------------- 6.17s
+# ensure ca-all group exists ------------------------------------- 6.17s
 # debug ------------------------------------------------------------------- 2.09s
 # debug ------------------------------------------------------------------- 1.04s
 
-- name: Debug infra-instances group creating
+- name: Debug ca-all group creating
   hosts: localhost
   gather_facts: false
 
   tasks:
-    - name: ensure infra-instances group exists
+    - name: ensure ca-all group exists
       add_host:
         name: '{{ item }}'
-        groups: infra-instances
+        groups: ca-all
       with_items:
-      - "{{ groups['infra'] }}"
-      - "{{ groups['instances'] }}"
-      when: groups['infra-instances'] is not defined
+        - "{{ groups['ca-server'] }}"
+        - "{{ groups['ca-node'] }}"
+      when: groups['ca-all'] is not defined
 
-    - debug: var=groups['infra-instances']
-    - debug: var=hostvars[groups['infra-instances'][0]]['inventory_hostname']
+    - debug: var=groups['ca-all']
+    - debug: var=hostvars[groups['ca-all'][0]]['inventory_hostname']
 
 # ft=ansible :

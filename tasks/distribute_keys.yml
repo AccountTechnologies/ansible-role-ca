@@ -5,8 +5,8 @@
     path: "{{ item }}"
     state: directory
     owner: root
-    group: ssl-cert
-    mode: 0755
+    group: root
+    mode: 0644
   with_items:
     - "{{ ca_default_ssl_certs_dir }}"
     - "{{ ca_default_ssl_key_dir }}"
@@ -17,40 +17,40 @@
   when: ansible_os_family == "RedHat"
   become: yes
 
-- name: "Distribute inventory_hostname-priv-key.pem to inventory_hostname"
-  copy:
-    src: "{{ ca_distribution_certs_dir }}/{{ inventory_hostname }}-priv-key.pem"
-    dest: "{{ ca_default_ssl_key_dir }}/{{ inventory_hostname }}-priv-key.pem"
-    owner: root
-    group: ssl-cert
-    mode: 0750
-  become: yes
+# - name: "Distribute inventory_hostname-priv-key.pem to inventory_hostname"
+#   copy:
+#     src: "{{ ca_distribution_certs_dir }}/{{ inventory_hostname }}-priv-key.pem"
+#     dest: "{{ ca_default_ssl_key_dir }}/{{ inventory_hostname }}-priv-key.pem"
+#     owner: root
+#     group: ssl-cert
+#     mode: 0750
+#   become: yes
 
-- name: "Distribute inventory_hostname-cert.pem to inventory_hostname"
-  copy:
-    src: "{{ ca_distribution_certs_dir }}/{{ inventory_hostname }}-cert.pem"
-    dest: "{{ ca_default_ssl_certs_dir }}/{{ inventory_hostname }}-cert.pem"
-    owner: root
-    group: ssl-cert
-    mode: 0755
-  become: yes
+# - name: "Distribute inventory_hostname-cert.pem to inventory_hostname"
+#   copy:
+#     src: "{{ ca_distribution_certs_dir }}/{{ inventory_hostname }}-cert.pem"
+#     dest: "{{ ca_default_ssl_certs_dir }}/{{ inventory_hostname }}-cert.pem"
+#     owner: root
+#     group: ssl-cert
+#     mode: 0755
+#   become: yes
 
 - name: "Copy {{ ca_cert }} to {{ ca_default_ssl_certs_dir }}"
   copy:
     src: "{{ ca_distribution_certs_dir }}/{{ ca_cert }}"
-    dest: "{{ ca_default_ssl_certs_dir }}/{{ ca_cert }}"
+    dest: "{{ ca_default_ssl_certs_dir }}/{{ ca_cert_dest }}"
     owner: root
-    group: ssl-cert
-    mode: 0755
+    group: root
+    mode: 0644
   become: yes
 
 # https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-14-04
-- name: Generate strong Diffie-Hellman group
-  shell: "openssl dhparam -out dhparam.pem 2048"
-  args:
-    chdir: "/etc/ssl/certs"
-    creates: "dhparam.pem"
-  become: yes
+# - name: Generate strong Diffie-Hellman group
+#   shell: "openssl dhparam -out dhparam.pem 2048"
+#   args:
+#     chdir: "/etc/ssl/certs"
+#     creates: "dhparam.pem"
+#   become: yes
 
 - name: Ensure certificate trust store is updated (Debian)
   shell: "update-ca-certificates"
@@ -62,17 +62,19 @@
   when: ansible_os_family == "RedHat"
   become: yes
 
-- name: Get file metadata
-  shell: "ls -lR {{ item }}"
-  with_items:
-    - "{{ ca_default_ssl_key_dir }}/{{ inventory_hostname }}-priv-key.pem"
-    - "{{ ca_default_ssl_certs_dir }}/{{ inventory_hostname }}-cert.pem"
-  register: ls
-  when: debug is defined and debug|bool
+# - name: Get file metadata
+#   shell: "ls -lR {{ item }}"
+#   with_items:
+#     - "{{ ca_default_ssl_key_dir }}/{{ inventory_hostname }}-priv-key.pem"
+#     - "{{ ca_default_ssl_certs_dir }}/{{ inventory_hostname }}-cert.pem"
+#   register: ls
+#   #when: debug is defined and debug|bool
 
-- debug: var=item.stdout_lines
-  with_items:
-    - "{{ ls.results }}"
-  when: debug is defined and debug|bool
+# - name: "print some results"
+#   debug: 
+#     var: item.stdout_lines
+#   with_items:
+#     - "{{ ls.results }}"
+#   #when: debug is defined and debug|bool
 
 # vim: ft=ansible :

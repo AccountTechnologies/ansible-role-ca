@@ -4,7 +4,7 @@
   shell: "openssl genrsa -out {{ ca_key }} 2048"
   args:
     chdir: "{{ ca_certs_dir }}"
-  when: _ca_needs_key or ca_force_create|bool
+  when: (_ca_needs_key is defined and _ca_needs_key|bool)  or (ca_force_create is defined and ca_force_create|bool)
   become: yes
 
 - name: "Create root CA cert"
@@ -15,7 +15,7 @@
     -subj '{{ ca_subject }}'
   args:
     chdir: "{{ ca_certs_dir }}"
-  when: _ca_needs_cert or ca_force_create|bool
+  when: (_ca_needs_key is defined and _ca_needs_key|bool)  or (ca_force_create is defined and ca_force_create|bool)
   become: yes
 
 # vim: ft=ansible :

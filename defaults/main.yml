@@ -17,8 +17,8 @@ ca_fetch_keys: false
 ca_distribute_keys: false
 
 # see "{{ ansible_os_family }}.yml" for pki_cert_dir definition
-ca_default_ssl_certs_dir: "{{ pki_cert_dir | d('/etc/ssl/certs') }}"
-ca_default_ssl_key_dir: "{{ pki_key_dir | d('/etc/ssl/private') }}"
+#ca_default_ssl_certs_dir: "{{ pki_cert_dir | d('/etc/ssl/certs') }}"
+#ca_default_ssl_key_dir: "{{ pki_key_dir | d('/etc/ssl/private') }}"
 
 # how long should remain before we generate a new CA cert ?
 ca_cert_expiration_panic_threshold: 604800 # 1 week

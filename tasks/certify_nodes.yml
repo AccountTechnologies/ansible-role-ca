@@ -9,21 +9,21 @@
     mode: 0755
   become: yes
 
-- name: "Generate certs for infra server || CA server"
+- name: "Generate certs for ca-server || CA server"
   shell: 'openssl genrsa -out {{ item }}-priv-key.pem 2048'
   args:
     chdir: "{{ ca_certs_dir }}"
   become: yes
-  with_inventory_hostnames: infra-instances:!localhost
+  with_inventory_hostnames: ca-all:!localhost
 
-- name: "Create certificate request for infra server || CA server"
+- name: "Create certificate request for ca-server || CA server"
   shell: >
     openssl req -subj "/CN={{ item }}"
     -new -key {{ item }}-priv-key.pem -out {{ item }}.csr
   args:
     chdir: "{{ ca_certs_dir }}"
   become: yes
-  with_inventory_hostnames: infra-instances:!localhost
+  with_inventory_hostnames: ca-all:!localhost
 
 - name: "Generate the CA trusted certificate"
   shell: >
@@ -35,6 +35,6 @@
   args:
     chdir: "{{ ca_certs_dir }}"
   become: yes
-  with_inventory_hostnames: infra-instances:!localhost
+  with_inventory_hostnames: ca-all:!localhost
 
 # vim: ft=ansible :

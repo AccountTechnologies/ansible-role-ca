@@ -15,7 +15,7 @@
     src: "{{ item }}.j2"
     dest: "{{ ca_certs_dir }}/{{ item }}"
     owner: root
-    group: ssl-cert
+    group: root #ssl-cert
     mode: 0750
   with_items:
     - serial

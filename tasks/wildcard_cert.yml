@@ -1,6 +1,6 @@
 ---
 
-- name: "Generate wildcard cert infra server || CA server"
+- name: "Generate wildcard cert ca-all server || CA server"
   shell: 'openssl genrsa -out {{ ca_domain }}-wildcard-priv-key.pem 2048'
   args:
     chdir: "{{ ca_certs_dir }}"
