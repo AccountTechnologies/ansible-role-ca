@@ -1,9 +1,21 @@
 ---
+- name: "Check if wildcard cert certificate exists (pem)"
+  stat:
+    path: "{{ ca_certs_dir }}/{{ ca_domain }}-wildcard-priv-key.pem"
+  register: _wildcard_pem_file
+  become: yes
 
 - name: "Generate wildcard cert ca-all server || CA server"
   shell: 'openssl genrsa -out {{ ca_domain }}-wildcard-priv-key.pem 2048'
   args:
     chdir: "{{ ca_certs_dir }}"
+  become: yes
+  when: _wildcard_pem_file.stat.exists == False
+
+- name: "Check if wildcard cert certificate exists (csr)"
+  stat:
+    path: "{{ ca_certs_dir }}/{{ ca_domain}}-wildcard.csr"
+  register: _wildcard_csr_file
   become: yes
 
 - name: "Create wildcard certificate request for *.{{ ca_domain }}"
@@ -13,7 +25,13 @@
   args:
     chdir: "{{ ca_certs_dir }}"
   become: yes
+  when: _wildcard_csr_file.stat.exists == False
 
+- name: "Check if CA trusted certificate exists"
+  stat:
+    path: "{{ ca_certs_dir }}/{{ ca_domain }}-wildcard-cert.pem"
+  register: _ca_trusted_pem_file
+  become: yes
 
 - name: "Generate the CA trusted certificate"
   shell: >
@@ -24,5 +42,4 @@
   args:
     chdir: "{{ ca_certs_dir }}"
   become: yes
-
-# vim: ft=ansible :
+  when: _ca_trusted_pem_file.stat.exists == False

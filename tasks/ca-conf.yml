@@ -22,4 +22,3 @@
     - ca.conf
   become: yes
 
-# vim: ft=ansible :

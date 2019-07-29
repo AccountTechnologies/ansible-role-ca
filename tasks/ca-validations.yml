@@ -49,6 +49,11 @@
 
     - set_fact:
         _ca_needs_cert: false
+      when: (_cert_file.stat.exists) and (_cert_validity.rc|int == 0)
+
+    - set_fact:
+        _ca_needs_cert: true
+      when: (not _ca_needs_cert is defined)
 
   rescue:
     - debug: 

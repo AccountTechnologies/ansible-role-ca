@@ -25,18 +25,18 @@
   tags: [ ca-certs ]
 
 - include: ca-conf.yml
-  when: (( ca_init is defined and ca_init|bool) and ((inventory_hostname in groups['ca-server'])) )
+  when: (( ca_force_create is defined and ca_force_create|bool) or (_ca_needs_cert is defined and _ca_needs_cert|bool)) and ((inventory_hostname in groups['ca-server'])) 
   tags: [ ca-certs ]
 
 - include: ca-key_n_cert.yml
-  when: (( ca_init is defined and ca_init|bool) and ((inventory_hostname in groups['ca-server'])) )
+  when: (( ca_force_create is defined and ca_force_create|bool) or (_ca_needs_cert is defined and _ca_needs_cert|bool)) and ((inventory_hostname in groups['ca-server']))
   tags: [ ca-certs ]
 
-#- include: certify_nodes.yml
-#  when: ((ca_certify_nodes is defined and ca_certify_nodes|bool) or
-#        (ca_force_certify_nodes is defined and ca_force_certify_nodes|bool))
-#         and (inventory_hostname == hostvars[groups['ca-all'][0]]['inventory_hostname'])
-#  tags: [ ca-certs ]
+# - include: certify_nodes.yml
+#   when: ((ca_certify_nodes is defined and ca_certify_nodes|bool) or
+#         (ca_force_certify_nodes is defined and ca_force_certify_nodes|bool))
+#          and (inventory_hostname == hostvars[groups['ca-all'][0]]['inventory_hostname'])
+#   tags: [ ca-certs ]
 
 - include: wildcard_cert.yml
   when: ( (ca_wildcard is defined and ca_wildcard|bool)  and ((inventory_hostname in groups['ca-server'])) )
@@ -50,4 +50,3 @@
   when: ca_distribute_keys is defined and ca_distribute_keys|bool
   tags: [ ca-certs ]
 
-# vim: ft=ansible :
