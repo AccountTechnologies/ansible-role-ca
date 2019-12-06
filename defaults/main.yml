@@ -27,7 +27,7 @@ ca_cert_expiration_panic_threshold: 604800 # 1 week
 ca_certs_dir: /usr/share/ca-certs
 
 # where to copy the produced files
-ca_distribution_certs_dir: "{{ playbook_dir }}/../keys_n_certs"
+ca_distribution_certs_dir: "{{ inventory_dir }}/keys_n_certs"
 
 ca_rootca_password: Chang3m3
 ca_cert: ca.pem
